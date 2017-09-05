@@ -39,8 +39,8 @@ and a list of all CRL distribution points (`CRL_servers`).
 
 2. Sort and eliminate duplicate entries in `CRL_servers` using the command
 `sort -u CRL_servers > CRL_servers_final`. You can compare your `CRL_servers_final`
-to my results contained in `CRL_servers_REFERENCE` to see that the replication
-results are similar up to this point.
+to [my results](https://drive.google.com/file/d/0B_ImpEaqYaA8MGRMSTh1cVJVdmM/view?usp=sharing)
+to see that the replication results are similar up to this point.
 
 3. Download all of the CRLs listed in `CRL_servers_final` using the command
 `wget -i CRL_servers_final`.
@@ -51,7 +51,7 @@ organized by CRL.
 
 5. Use `count_serials.py` to see the total number of revocation serials that are
 contained in the megaCRL. You can compare your results against mine by using the
-same script on `megaCRL_REFERENCE`.
+same script on [this file](https://drive.google.com/file/d/0B_ImpEaqYaA8WTVrakVUMVMxbDQ/view?usp=sharing).
 
 6. Match the revocation serial numbers to known certificates using the `build_CRL_revoked.py`
 script. This script uses multiprocessing to get around the I/O bottleneck,
@@ -76,7 +76,7 @@ set of all revoked certificates and all valid certificates. This script uses mul
 so after running the script you will need to use `cat final_unrevoked/*.json > final_unrevoked.json`
 and `cat final_revoked/*.json > final_revoked.json` to combine the results of the individual
 workers into a single file. You can see how your results match against mine by comparing
-against the included `final_revoked_REFERENCE.json` file.
+against [this file](https://drive.google.com/file/d/0B_ImpEaqYaA8eHVlTnJ4cW9lclk/view?usp=sharing).
 
 2. Use the command `node --max_old_space_size=32768 build_filer.js > filter` to assemble
 the final filter.
