@@ -2,54 +2,75 @@ from urlparse import urlparse
 import os.path
 from multiprocessing import Process, Queue
 import json
+import sys
 
-workers = 32
-outfile = 'revokedCRLCerts/certs'
-infile = 'certs_using_crl.json'
-crlInfileName = 'megaCRL'
+WORKERS = 64
+INFILE = 'certs_using_crl.json'
+CRL = 'megaCRL'
+OUTFILE = 'revokedCRLCerts/certs'
 
-def doWork(i, megaCRL):
+def doWork(i, megaCRL_org, megaCRL_CN):
     print('starting worker ' + str(i))
-    out = open(outfile + str(i) + '.json', 'w')
-    while True:
-        cert = json.loads(q.get())
-        serial = int(cert['parsed']['serial_number'])
-        urlList = cert['parsed']['extensions']['crl_distribution_points']
-        url = urlparse(urlList[0])
-        crlName = os.path.split(url.path)[1]
-        if(isRevoked(megaCRL, crlName, serial)):
-            out.write(json.dumps(cert) + '\n')
+    with open(OUTFILE + str(i), 'w') as out:
+        while True:
+            try:
+                cert = json.loads(q.get())
+                serial = int(cert['parsed']['serial_number'])
+                issuer = cert['parsed']['issuer']
+            except:
+                continue # skip to next certificate
+            try:
+                org = issuer['organization'][0].replace(" ", "_")
+            except:
+                org = 'unknown'
+            try:
+                CN = issuer['common_name'][0].replace(" ", "_")
+            except:
+                CN = 'unknown'
+            if(isRevoked(megaCRL_org, megaCRL_CN, org, CN, serial)):
+                out.write(json.dumps(cert) + '\n')
 
-# TODO: this definition of isRevoked is outdated, and not
-# the version that I used for my analysis. It doesn't account
-# for instances where the wget fetch of a CRL changed its name.
-# I have improved tooling, which I actually used in the final analysis,
-# that I will add soon. 
-def isRevoked(megaCRL, crlName, serial):
-    if crlName in megaCRL:
-        return serial in megaCRL[crlName]
-    else:
-        return False
+def isRevoked(megaCRL_org, megaCRL_CN, org, CN, serial):
+    if org in megaCRL_org:
+        if serial in megaCRL_org[org]:
+            return True
+    if CN in megaCRL_CN:
+        if serial in megaCRL_CN[CN]:
+            return True
+    return False
 
 def buildDict():
-    megaCRL = {}
-    crlFile = open(crlInfileName, 'r')
+    megaCRL_CN = {}
+    megaCRL_org = {}
+    crlFile = open(CRL, 'r')
     for line in crlFile:
-        crlName, revokedList = line.split(' ', 1)
-        revokedListParsed = json.loads(revokedList)
-        megaCRL[crlName] = [int(x, 16) for x in revokedListParsed]
-    return megaCRL
+        parsed = json.loads(line)
+        issuer = parsed['crl_issuer']
+        for entry in issuer:
+            if entry[0] == "O":
+                org = entry[1].replace(" ", "_")
+                if not org in megaCRL_org:
+                    megaCRL_org[org] = []
+                for serial in parsed['cert_serials']:
+                    megaCRL_org[org].append(int(serial, 16))
+            if entry[0] == "CN":
+                CN = entry[1].replace(" ", "_")
+                if not CN in megaCRL_CN:
+                    megaCRL_CN[CN] = []
+                for serial in parsed['cert_serials']:
+                    megaCRL_CN[CN].append(int(serial, 16))
+    return megaCRL_CN, megaCRL_org
 
 if __name__ == '__main__':
     print('building megaCRL...')
-    megaCRL = buildDict()
-    q = Queue(workers * 16)
-    for i in range(workers):
-        p = Process(target=doWork, args=(i, megaCRL, ))
+    megaCRL_CN, megaCRL_org = buildDict()
+    q = Queue(WORKERS * 16)
+    for i in range(WORKERS):
+        p = Process(target=doWork, args=(i, megaCRL_org, megaCRL_CN, ))
         p.start()
     try:
         ctr = 0
-        for cert in open(infile, 'r'):
+        for cert in open(INFILE, 'r'):
             q.put(cert)
             ctr += 1
             if(ctr % 10000 == 0):

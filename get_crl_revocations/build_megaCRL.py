@@ -3,39 +3,57 @@ import OpenSSL
 import json
 import os
 
+WORKERS = 4
 outfile = 'megaCRL'
 inpath = 'rawCRL/' # point this to the folder containing all raw CRL files
 
-def mp_worker(crl_name):
+def mp_worker(crl_path):
     revoked_data = {}
-    revoked_data['crl'] = crl_name
+    revoked_data['path'] = crl_path
     revoked_data['cert_serials'] = []
-    infile = open(inpath + crl_name, 'rb') # read as binary
-    rawtext = infile.read()
-    infile.close()
+    revoked_data['crl_issuer'] = []
+    try :
+        infile = open(crl_path, 'rb') # read as binary
+        rawtext = infile.read()
+        infile.close()
+    except:
+        print("could not open " + crl_path)
+        return json.dumps(revoked_data)
     try:
         crl = OpenSSL.crypto.load_crl(OpenSSL.crypto.FILETYPE_ASN1, rawtext)
     except:
         try:
-        crl = OpenSSL.crypto.load_crl(OpenSSL.crypto.FILETYPE_PEM, rawtext)
+            crl = OpenSSL.crypto.load_crl(OpenSSL.crypto.FILETYPE_PEM, rawtext)
         except:
-            print("couldn't open " + crl_name)
+            print("could not read " + crl_path)
             return json.dumps(revoked_data)
+    revoked_data['crl_issuer'] = crl.get_issuer().get_components()
     revoked = crl.get_revoked()
     if revoked is None:
-        print(crl_name + " is empty")
-        return json.dumps(revoked_data)
+        print(crl_path + " is empty")
+        return json.dumps(revoked_data, cls=ExtendedJSONEncoder)
     for rvk in revoked:
         serial = rvk.get_serial().decode('utf-8')
         revoked_data['cert_serials'].append(serial)
-    return json.dumps(revoked_data)
+    return json.dumps(revoked_data, cls=ExtendedJSONEncoder)
 
+class ExtendedJSONEncoder(json.JSONEncoder):
+    def default(self, o):
+        if isinstance(o, bytes):
+            return o.decode()
+        else:
+            return super().default(o)
 
 def mp_handler():
-    p = multiprocessing.Pool(4)
-    crl_names = os.listdir(inpath)
+    print('searching for crls')
+    p = multiprocessing.Pool(WORKERS)
+    crl_paths = []
+    for path, dirs, files in os.walk(inpath):
+        for filename in files:
+            crl_paths.append(os.path.join(path, filename))
+    print('reading files')
     with open(outfile, 'w') as f:
-        for result in p.imap(mp_worker, crl_names):
+        for result in p.imap(mp_worker, crl_paths):
             f.write(result + '\n')
 
 if __name__=='__main__':
