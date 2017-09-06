@@ -4,19 +4,20 @@ in this [CRLite paper.](http://www.ccs.neu.edu/home/cbw/static/pdf/larisch-oakla
 
 ## Dependancies
 1. A [Censys](https://censys.io) Researcher Account (for downloading certificates)
-2. About 3 terabytes (!!) of space to store certificates and associated data
+2. **About 3 terabytes of space to store certificates and associated data**
 3. Node
 4. Python
 5. Lots of patience, as many of the scripts take several hours even with multiprocessing
 
 ## Instructions
-### 1. Obtaining all NSS-trusted Certificates
+### Part A: Obtaining all NSS-trusted Certificates
 1. After obtaining a researcher account on [Censys](https://censys.io),
 perform the following Data export query to collect all valid NSS-trusted certificates.
 Be sure to request the results in JSON format, and select the "nested" option to
 prevent collisions when flattening the data entries. The compression option is also
-recommended (see screenshot below). If you just want to try the tools on a small sample
-subset of certificates, use [this file](https://drive.google.com/open?id=0B_ImpEaqYaA8djd2NkxLNFdEdE0) instead.
+recommended (see screenshot below). **If you just want to try the tools on a small sample
+subset of certificates (no Censys account required), use [this file](https://drive.google.com/open?id=0B_ImpEaqYaA8djd2NkxLNFdEdE0) instead and
+skip to step 3.**
 
 ```
 SELECT parsed.*
@@ -35,7 +36,7 @@ of the certificate files.
 Unzip with `gzip -u *.gz`, then unify the files with `cat *.json > certificates.json`.
 You can then delete all files except for `certificates.json`.
 
-### 2. Determining CRL Revocations
+### Part B: Determining CRL Revocations
 1. Extract the CRL distribution points using the `extract_crls.py` script. This
 script will output three files: a file of all certificates which have listed CRLs(`certs_using_crl.json`),
 a file of all certificates which do not list a CRL(`certs_without_crl.json`),
@@ -66,7 +67,7 @@ will need to combine each output file into a single, final result using
 
 7. Count the number of actual revoked certificates using `wc -l final_CRL_revoked.json`.
 
-### 3. Determining OCSP Revocations
+### Part C: Determining OCSP Revocations
 1. Use the `build_OCSP_revoked.py` script to determine all Let's Encrypt revocations.
 This tooling replicates the process of the CRLite authors, and I believe they made this
 design choice to only include OCSP for Let's Encrypt based off the statistic that the
@@ -74,7 +75,7 @@ vast majority of OCSP-only certificates are issued by them. After the script com
 combine the results of each worker into a final output file with
 `cat OCSP_revoked/certs* > final_OCSP_revoked.json`.
 
-### 4. Building The Filter
+### Part D: Building The Filter
 1. Use `build_final_sets.py` to convert the data created from the steps above into a single
 set of all revoked certificates and all valid certificates. This script uses multiprocessing,
 so after running the script you will need to use `cat final_unrevoked/*.json > final_unrevoked.json`
