@@ -15,12 +15,16 @@ in this [CRLite paper.](http://www.ccs.neu.edu/home/cbw/static/pdf/larisch-oakla
 perform the following Data export query to collect all valid NSS-trusted certificates.
 Be sure to request the results in JSON format, and select the "nested" option to
 prevent collisions when flattening the data entries. The compression option is also
-recommended.
+recommended (see screenshot below). If you just want to try the tools on a small sample
+subset of certificates, use [this file](https://drive.google.com/open?id=0B_ImpEaqYaA8djd2NkxLNFdEdE0) instead.
+
 ```
 SELECT parsed.*
 FROM certificates.certificates
-WHERE validation.nss.trusted = TRUE
+WHERE validation.nss.valid = TRUE
 ```
+
+![Screenshot](Censys_data_export.png "Screenshot")
 
 2. Download the exported certificates, which will be provided in several hundred
 files. The recommended method is to copy-paste the provided download URLs into
