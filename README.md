@@ -43,7 +43,7 @@ and a list of all CRL distribution points (`CRL_servers`).
 
 2. Sort and eliminate duplicate entries in `CRL_servers` using the command
 `sort -u CRL_servers > CRL_servers_final`. You can compare your `CRL_servers_final`
-to [my results](https://drive.google.com/file/d/0B_ImpEaqYaA8MGRMSTh1cVJVdmM/view?usp=sharing)
+to [my reference CRL list](https://drive.google.com/file/d/0B_ImpEaqYaA8MGRMSTh1cVJVdmM/view?usp=sharing)
 to see that the replication results are similar up to this point.
 
 3. Download all of the CRLs listed in `CRL_servers_final` using the command
@@ -55,7 +55,7 @@ organized by CRL.
 
 5. Use `count_serials.py` to see the total number of revocation serials that are
 contained in the megaCRL. You can compare your results against mine by using the
-same script on [this file](https://drive.google.com/file/d/0B_ImpEaqYaA8WTVrakVUMVMxbDQ/view?usp=sharing).
+same script on [my reference megaCRL file](https://drive.google.com/file/d/0B_ImpEaqYaA8Y0YxRzhsZ09UX0E/view?usp=sharing).
 
 6. Match the revocation serial numbers to known certificates using the `build_CRL_revoked.py`
 script. This script uses multiprocessing to get around the I/O bottleneck,
