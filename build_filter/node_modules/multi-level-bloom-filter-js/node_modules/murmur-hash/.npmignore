@@ -1,0 +1,7 @@
+test
+examples
+
+.gitattributes
+
+murmur-hash*.tgz
+*~

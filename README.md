@@ -2,6 +2,8 @@ This collection of tools is designed to assemble a cascading
 bloom filter containing all TLS certificate revocations, as described
 in this [CRLite paper.](http://www.ccs.neu.edu/home/cbw/static/pdf/larisch-oakland17.pdf)
 
+These tools were built from scratch, using the original CRLite research code as a design reference and closely following the documentation in their paper. 
+
 ## Dependancies
 1. A [Censys](https://censys.io) Researcher Account (for downloading certificates)
 2. **About 3 terabytes of space to store certificates and associated data**
@@ -97,4 +99,7 @@ against [this file](https://drive.google.com/file/d/0B_ImpEaqYaA8eHVlTnJ4cW9lclk
 
 2. Use the command `node ./build_filer.js --max_old_space_size=32768 > filter` to assemble
 the final filter. Be sure to change the `REVOKED` and `UNREVOKED` constants to reflect
-accurately.
+accurately. **(acknowledgements to James Larisch for the build_filter.js code)**
+
+## Acknowledgements 
+Thanks to Eric Rescorla, J.C. Jones, James Larisch, the CRLite research team and the Mozilla Cryptography Engineering team.
