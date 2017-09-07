@@ -6,8 +6,10 @@ in this [CRLite paper.](http://www.ccs.neu.edu/home/cbw/static/pdf/larisch-oakla
 1. A [Censys](https://censys.io) Researcher Account (for downloading certificates)
 2. **About 3 terabytes of space to store certificates and associated data**
 3. Node
-4. Python
-5. Lots of patience, as many of the scripts take several hours even with multiprocessing
+4. Python 3
+5. Aria2c (or wget or Curl)
+6. pyopenssl (at least version 16.1.0)
+7. Lots of patience, as many of the scripts take several hours even with multiprocessing
 
 ## Instructions
 ### Part A: Obtaining all NSS-trusted Certificates
@@ -50,14 +52,16 @@ and a list of all CRL distribution points (`CRL_servers`).
 to [my reference CRL list](https://drive.google.com/file/d/0B_ImpEaqYaA8MGRMSTh1cVJVdmM/view?usp=sharing)
 to see that the replication results are similar up to this point.
 
-3. Download all of the CRLs listed in `CRL_servers_final` using the command
-`wget -i CRL_servers_final`.
+3. Download all of the CRLs listed in `CRL_servers_final`. First create a new subdirectory `raw_CRLs`, set it as the working directory, then run `aria2c -i ../CRL_servers_final -j 16`.
 
-4. Create a catalogue, or "megaCRL," of all revocations using the `build_megaCRL.py`
-script. This will output `megaCRL`, which contains all revocation serial numbers
+
+4. Set the working directory back one level up (to `get_CRL_revocations` again).
+Create a catalogue, or "megaCRL," of all revocations with `python build_megaCRL.py`
+script **(note that this must use python3 and pyopenssl version 16.1.0 and above)**.
+This will output `megaCRL`, which contains all revocation serial numbers
 organized by CRL.
 
-5. Use `count_serials.py` to see the total number of revocation serials that are
+5. Use `python count_serials.py` to see the total number of revocation serials that are
 contained in the megaCRL. You can compare your results against mine by using the
 same script on [my reference megaCRL file](https://drive.google.com/file/d/0B_ImpEaqYaA8Y0YxRzhsZ09UX0E/view?usp=sharing).
 

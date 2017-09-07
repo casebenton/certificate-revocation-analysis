@@ -5,12 +5,8 @@ crlInfileName = 'megaCRL'
 print('reading megaCRL...')
 megaCRL = {}
 crlFile = open(crlInfileName, 'r')
-for line in crlFile:
-    crlName, revokedList = line.split(' ', 1)
-    revokedListParsed = json.loads(revokedList)
-    megaCRL[crlName] = [int(x, 16) for x in revokedListParsed]
-
 certCtr = 0
-for key in megaCRL:
-    certCtr += len(megaCRL[key])
+for line in crlFile:
+    crlData = json.loads(line)
+    certCtr += len(crlData["cert_serials"])
 print('there are ' + str(certCtr) + ' total revocations')

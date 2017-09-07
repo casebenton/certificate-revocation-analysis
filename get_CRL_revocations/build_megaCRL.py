@@ -5,7 +5,17 @@ import os
 
 WORKERS = 4
 outfile = 'megaCRL'
-inpath = 'rawCRL/' # point this to the folder containing all raw CRL files
+inpath = 'raw_CRLs/'
+
+def open_crl(rawtext):
+    try:
+        return OpenSSL.crypto.load_crl(OpenSSL.crypto.FILETYPE_ASN1, rawtext)
+    except:
+        pass
+    try:
+        return OpenSSL.crypto.load_crl(OpenSSL.crypto.FILETYPE_PEM, rawtext)
+    except:
+        return False
 
 def mp_worker(crl_path):
     revoked_data = {}
@@ -19,18 +29,13 @@ def mp_worker(crl_path):
     except:
         print("could not open " + crl_path)
         return json.dumps(revoked_data)
-    try:
-        crl = OpenSSL.crypto.load_crl(OpenSSL.crypto.FILETYPE_ASN1, rawtext)
-    except:
-        try:
-            crl = OpenSSL.crypto.load_crl(OpenSSL.crypto.FILETYPE_PEM, rawtext)
-        except:
-            print("could not read " + crl_path)
-            return json.dumps(revoked_data)
+    crl = open_crl(rawtext)
+    if crl == False: # if reading failed
+        print("could not open " + crl_path)
+        return json.dumps(revoked_data)
     revoked_data['crl_issuer'] = crl.get_issuer().get_components()
     revoked = crl.get_revoked()
     if revoked is None:
-        print(crl_path + " is empty")
         return json.dumps(revoked_data, cls=ExtendedJSONEncoder)
     for rvk in revoked:
         serial = rvk.get_serial().decode('utf-8')
