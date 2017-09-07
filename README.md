@@ -34,9 +34,12 @@ of the certificate files.
 
 3. Unzip the certificate files and place their contents in a single, unified file.
 Unzip with `gzip -u *.gz`, then unify the files with `cat *.json > certificates.json`.
-You can then delete all files except for `certificates.json`.
+You can then delete all files except for `certificates.json`. (If you're using
+the sample file, then just unzip it and rename it as `certificates.json`).
 
 ### Part B: Determining CRL Revocations
+0. Set `get_CRL_revocations` as the working directory. This folder contains all scripts for Part B.
+
 1. Extract the CRL distribution points using the `extract_crls.py` script. This
 script will output three files: a file of all certificates which have listed CRLs(`certs_using_crl.json`),
 a file of all certificates which do not list a CRL(`certs_without_crl.json`),
@@ -68,6 +71,8 @@ will need to combine each output file into a single, final result using
 7. Count the number of actual revoked certificates using `wc -l final_CRL_revoked.json`.
 
 ### Part C: Determining OCSP Revocations
+0. Set `get_OCSP_revocations` as the working directory. This folder contains all scripts for Part C.
+
 1. Use the `build_OCSP_revoked.py` script to determine all Let's Encrypt revocations.
 This tooling replicates the process of the CRLite authors, and I believe they made this
 design choice to only include OCSP for Let's Encrypt based off the statistic that the
@@ -76,6 +81,8 @@ combine the results of each worker into a final output file with
 `cat OCSP_revoked/certs* > final_OCSP_revoked.json`.
 
 ### Part D: Building The Filter
+0. Set `build_filter` as the working directory. This folder contains all scripts for Part D.
+
 1. Use `build_final_sets.py` to convert the data created from the steps above into a single
 set of all revoked certificates and all valid certificates. This script uses multiprocessing,
 so after running the script you will need to use `cat final_unrevoked/*.json > final_unrevoked.json`
