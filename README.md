@@ -6,7 +6,7 @@ in this [CRLite paper.](http://www.ccs.neu.edu/home/cbw/static/pdf/larisch-oakla
 1. A [Censys](https://censys.io) Researcher Account (for downloading certificates)
 2. **About 3 terabytes of space to store certificates and associated data**
 3. Node
-4. Python 3
+4. Python 2 & Python 3 (default is to use Python 2 except when explicitly noted)
 5. Aria2c (or wget or Curl)
 6. pyopenssl (at least version 16.1.0)
 7. Lots of patience, as many of the scripts take several hours even with multiprocessing
@@ -56,7 +56,7 @@ to see that the replication results are similar up to this point.
 
 
 4. Set the working directory back one level up (to `get_CRL_revocations` again).
-Create a catalogue, or "megaCRL," of all revocations with `python build_megaCRL.py`
+Create a catalogue, or "megaCRL," of all revocations with `python3 build_megaCRL.py`
 script **(note that this must use python3 and pyopenssl version 16.1.0 and above)**.
 This will output `megaCRL`, which contains all revocation serial numbers
 organized by CRL.
@@ -65,12 +65,12 @@ organized by CRL.
 contained in the megaCRL. You can compare your results against mine by using the
 same script on [my reference megaCRL file](https://drive.google.com/file/d/0B_ImpEaqYaA8Y0YxRzhsZ09UX0E/view?usp=sharing).
 
-6. Match the revocation serial numbers to known certificates using the `build_CRL_revoked.py`
-script. This script uses multiprocessing to get around the I/O bottleneck,
+6. Make a new subdirectory `revokedCRLCerts`, then match the revocation serial numbers to known certificates using `python build_CRL_revoked.py`.
+This script uses multiprocessing to get around the I/O bottleneck,
 and you may need to adjust the number of "worker" processes to get optimal
 speed on your machine. Each worker has a dedicated output file, so after the script you
 will need to combine each output file into a single, final result using
-`cat revokedCRLCerts/certs* > final_CRL_revoked.json`.
+`cat revokedCRLCerts/certs* > ../final_CRL_revoked.json`.
 
 7. Count the number of actual revoked certificates using `wc -l final_CRL_revoked.json`.
 

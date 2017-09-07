@@ -4,8 +4,8 @@ from multiprocessing import Process, Queue
 import json
 import sys
 
-WORKERS = 64
-INFILE = 'certs_using_crl.json'
+WORKERS = 16
+INFILE = '../certs_using_crl.json'
 CRL = 'megaCRL'
 OUTFILE = 'revokedCRLCerts/certs'
 
