@@ -82,17 +82,19 @@ This tooling replicates the process of the CRLite authors, and I believe they ma
 design choice to only include OCSP for Let's Encrypt based off the statistic that the
 vast majority of OCSP-only certificates are issued by them. After the script completes,
 combine the results of each worker into a final output file with
-`cat OCSP_revoked/certs* > final_OCSP_revoked.json`.
+`cat OCSP_revoked/certs* > ../final_OCSP_revoked.json`.
 
 ### Part D: Building The Filter
 0. Set `build_filter` as the working directory. This folder contains all scripts for Part D.
+Make subdirectories `final_unrevoked` and `final_revoked`.
 
-1. Use `build_final_sets.py` to convert the data created from the steps above into a single
+1. Use `python build_final_sets.py` to convert the data created from the steps above into a single
 set of all revoked certificates and all valid certificates. This script uses multiprocessing,
-so after running the script you will need to use `cat final_unrevoked/*.json > final_unrevoked.json`
-and `cat final_revoked/*.json > final_revoked.json` to combine the results of the individual
+so after running the script you will need to use `cat final_unrevoked/*.json > ../final_unrevoked.json`
+and `cat final_revoked/*.json > ../final_revoked.json` to combine the results of the individual
 workers into a single file. You can see how your results match against mine by comparing
 against [this file](https://drive.google.com/file/d/0B_ImpEaqYaA8eHVlTnJ4cW9lclk/view?usp=sharing).
 
-2. Use the command `node --max_old_space_size=32768 build_filer.js > filter` to assemble
-the final filter.
+2. Use the command `node ./build_filer.js --max_old_space_size=32768 > filter` to assemble
+the final filter. Be sure to change the `REVOKED` and `UNREVOKED` constants to reflect
+accurately.

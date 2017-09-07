@@ -3,10 +3,10 @@ from multiprocessing import Process, Queue
 import json
 
 workers = 64
-infile_certs1 = 'certs_using_crl.json' 
-infile_certs2 = 'certs_without_crl.json'
-infile_revoked1 = 'revokedOCSPCerts.json'
-infile_revoked2 = 'revokedCRLCerts.json'
+infile_certs1 = '../certs_using_crl.json' 
+infile_certs2 = '../certs_without_crl.json'
+infile_revoked1 = '../final_OCSP_revoked.json'
+infile_revoked2 = '../final_CRL_revoked.json'
 unrevoked_outfile = 'final_unrevoked/'
 revoked_outfile = 'final_revoked/'
 
