@@ -40,9 +40,9 @@ the sample file, then just unzip it and rename it as `certificates.json`).
 ### Part B: Determining CRL Revocations
 0. Set `get_CRL_revocations` as the working directory. This folder contains all scripts for Part B.
 
-1. Extract the CRL distribution points using the `extract_crls.py` script. This
-script will output three files: a file of all certificates which have listed CRLs(`certs_using_crl.json`),
-a file of all certificates which do not list a CRL(`certs_without_crl.json`),
+1. Extract the CRL distribution points by running `python extract_crls.py`. This
+script will output three files: a file of all certificates which have listed CRLs(`../certs_using_crl.json`),
+a file of all certificates which do not list a CRL(`../certs_without_crl.json`),
 and a list of all CRL distribution points (`CRL_servers`).
 
 2. Sort and eliminate duplicate entries in `CRL_servers` using the command
