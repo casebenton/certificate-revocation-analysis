@@ -75,9 +75,9 @@ will need to combine each output file into a single, final result using
 7. Count the number of actual revoked certificates using `wc -l final_CRL_revoked.json`.
 
 ### Part C: Determining OCSP Revocations
-0. Set `get_OCSP_revocations` as the working directory. This folder contains all scripts for Part C.
+0. Set `get_OCSP_revocations` as the working directory. This folder contains all scripts for Part C. Make a subdirectory called `OCSP_revoked`.
 
-1. Use the `build_OCSP_revoked.py` script to determine all Let's Encrypt revocations.
+1. Use `python build_OCSP_revoked.py` to determine all Let's Encrypt revocations.
 This tooling replicates the process of the CRLite authors, and I believe they made this
 design choice to only include OCSP for Let's Encrypt based off the statistic that the
 vast majority of OCSP-only certificates are issued by them. After the script completes,

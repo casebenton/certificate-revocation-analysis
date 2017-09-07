@@ -1,4 +1,3 @@
-#! /usr/bin/env python
 from urlparse import urlparse
 from multiprocessing import Process, Queue
 import httplib, sys, urllib
@@ -8,9 +7,9 @@ from ocspbuilder import OCSPRequestBuilder
 from asn1crypto import core, ocsp
 import base64
 
-workers = 512
+workers = 256
 outfile = './OCSP_revoked/certs'
-infile = 'certs_without_crl.json'
+infile = '../certs_without_crl.json'
 
 issuerCerts = {}
 issuer1 = open('lets-encrypt-x1-cross-signed.pem').read()
